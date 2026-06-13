@@ -1,0 +1,45 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Maton API-Token",
+        "description": "Hole den Token auf https://maton.ai → Connections → Microsoft To Do. Er beginnt mit 'ghp_' und gibt uns Zugriff auf deine Listen.",
+        "data": {
+          "token": "Maton API-Token"
+        }
+      },
+      "list": {
+        "title": "Liste auswählen",
+        "description": "Wähle die Microsoft-To-Do-Liste, die du in Home Assistant einbinden willst. Du kannst später weitere Listen als separate Integration hinzufügen.",
+        "data": {
+          "list_id": "Liste"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Token ungültig oder abgelaufen. Bitte neuen Token auf maton.ai erzeugen.",
+      "cannot_connect": "Verbindung zur Maton-API fehlgeschlagen. Netzwerk prüfen.",
+      "no_lists": "Keine To-Do-Listen im Microsoft-Konto gefunden.",
+      "unknown": "Unerwarteter Fehler. Siehe Home-Assistant-Logs."
+    },
+    "abort": {
+      "already_configured": "Diese Liste ist bereits eingerichtet."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Einstellungen",
+        "data": {
+          "scan_interval": "Update-Intervall (Sekunden, 60–3600)",
+          "show_completed": "Erledigte Aufgaben anzeigen"
+        }
+      }
+    }
+  },
+  "entity": {
+    "todo": {
+      "name": "To-Do-Liste"
+    }
+  }
+}

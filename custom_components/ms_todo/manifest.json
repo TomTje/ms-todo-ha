@@ -1,0 +1,13 @@
+{
+  "domain": "ms_todo",
+  "name": "Microsoft To Do (Maton)",
+  "version": "0.1.0",
+  "config_flow": true,
+  "documentation": "https://github.com/TomTje/ms-todo-ha",
+  "issue_tracker": "https://github.com/TomTje/ms-todo-ha/issues",
+  "codeowners": ["@TomTje"],
+  "requirements": [],
+  "iot_class": "cloud_polling",
+  "integration_type": "service",
+  "dependencies": []
+}

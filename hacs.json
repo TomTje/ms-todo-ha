@@ -1,0 +1,7 @@
+{
+  "name": "MS To Do (Maton)",
+  "version": "0.1.0",
+  "description": "Microsoft To Do integration for Home Assistant via Maton API",
+  "slug": "ms_todo",
+  "url": "https://github.com/TomTje/ms-todo-ha"
+}

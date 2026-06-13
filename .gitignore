@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+
+# HA
+*.log
+home-assistant.log*
+.storage/
+
+# Mac
+.DS_Store
