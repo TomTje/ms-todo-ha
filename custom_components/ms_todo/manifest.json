@@ -6,7 +6,7 @@
   "documentation": "https://github.com/TomTje/ms-todo-ha",
   "issue_tracker": "https://github.com/TomTje/ms-todo-ha/issues",
   "codeowners": ["@TomTje"],
-  "requirements": [],
+  "requirements": ["async_timeout>=4.0.0"],
   "iot_class": "cloud_polling",
   "integration_type": "service",
   "dependencies": []

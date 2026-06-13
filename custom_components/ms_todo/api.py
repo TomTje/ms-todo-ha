@@ -9,8 +9,7 @@ import logging
 from typing import Any
 
 import aiohttp
-
-from homeassistant.util.timeout import Timeout  # pyright: ignore[reportMissingImports]
+import async_timeout
 
 from .const import API_BASE
 
@@ -43,7 +42,7 @@ class MatonTodoApi:
         """Generischer Request-Wrapper mit Fehlerbehandlung."""
         url = f"{API_BASE}{path}"
         try:
-            async with Timeout(15):
+            async with async_timeout.timeout(15):
                 resp = await self._session.request(
                     method, url, headers=self._headers, **kwargs
                 )
