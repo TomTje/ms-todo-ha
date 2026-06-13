@@ -12,6 +12,7 @@ from homeassistant.components.todo import (
     TodoItem,
     TodoItemStatus,
     TodoListEntity,
+    TodoListEntityFeature,
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -41,6 +42,13 @@ class MsTodoListEntity(
 
     _attr_has_entity_name = True
     _attr_translation_key = "todo"
+    # Welche Aktionen unterstuetzt diese Entity? Ohne diese Deklaration
+    # zeigt die HA-UI KEINE Buttons fuer Hinzufuegen/Abhaken/Loeschen.
+    _attr_supported_features = (
+        TodoListEntityFeature.CREATE_TODO_ITEM
+        | TodoListEntityFeature.UPDATE_TODO_ITEM
+        | TodoListEntityFeature.DELETE_TODO_ITEM
+    )
 
     def __init__(
         self, coordinator: MsTodoCoordinator, entry: ConfigEntry
