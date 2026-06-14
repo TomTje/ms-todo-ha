@@ -155,6 +155,11 @@ class MsTodoConfigFlow(ConfigFlow, domain=DOMAIN):
                                 CONF_SCAN_INTERVAL: DEFAULT_SCAN_INTERVAL,
                                 CONF_SHOW_COMPLETED: DEFAULT_SHOW_COMPLETED,
                             },
+                            discovery_keys={},
+                            minor_version=1,
+                            source="user",
+                            subentries_data={},
+                            unique_id=f"{DOMAIN}_{list_id}",
                         )
                     )
                 
