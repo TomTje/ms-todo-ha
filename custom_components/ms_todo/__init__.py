@@ -12,10 +12,23 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from .api import MatonAuthError, MatonTodoApi, MatonTodoApiError
 from .const import CONF_ACCOUNT_EMAIL, CONF_ACCOUNT_NAME, CONF_LIST_ID, CONF_LIST_NAME, DOMAIN
 from .coordinator import MsTodoCoordinator
+from .services import async_register_services
 
 _LOGGER = logging.getLogger(__name__)
 
 PLATFORMS: list[Platform] = [Platform.TODO]
+
+# Services einmalig beim Start registrieren (nicht pro ConfigEntry)
+_services_registered = False
+
+
+async def async_setup(hass: HomeAssistant, _: dict) -> bool:
+    """Einmalige Setup-Logik beim Laden der Integration."""
+    global _services_registered
+    if not _services_registered:
+        await async_register_services(hass)
+        _services_registered = True
+    return True
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -44,6 +57,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     entry.async_on_unload(entry.add_update_listener(_async_update_listener))
 
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = {
+        "entry": entry,
         "coordinator": coordinator,
         "api": api,
     }

@@ -1,0 +1,48 @@
+# Custom Services für MS To Do
+# Werden über Developer Tools → Services aufgerufen
+
+set_importance:
+  name: Set Importance
+  description: Setze die Wichtigkeit einer Aufgabe (high, normal, low)
+  target:
+    entity:
+      integration: ms_todo
+  fields:
+    task_id:
+      name: Task ID
+      description: Die ID der Aufgabe (aus Developer Tools)
+      example: "ABCkADAwATM0..."
+      required: true
+      selector:
+        text:
+    importance:
+      name: Wichtigkeit
+      description: "Wichtigkeit: high, normal, oder low"
+      required: true
+      selector:
+        select:
+          options:
+            - "high"
+            - "normal"
+            - "low"
+
+set_categories:
+  name: Set Categories
+  description: Setze die Kategorien einer Aufgabe (ersetzt alle bestehenden)
+  target:
+    entity:
+      integration: ms_todo
+  fields:
+    task_id:
+      name: Task ID
+      description: Die ID der Aufgabe
+      example: "ABCkADAwATM0..."
+      required: true
+      selector:
+        text:
+    categories:
+      name: Kategorien
+      description: "Liste von Kategorien, z.B. ['Arbeit', 'Dringend']"
+      required: true
+      selector:
+        object:
