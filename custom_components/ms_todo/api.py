@@ -184,16 +184,18 @@ class MatonTodoApi:
         reminder: str | None = None,
     ) -> None:
         """Aktualisiere erweiterte Felder einer Aufgabe."""
-        body: dict[str, Any] = {}
+        body: dict[str, Any] = {"_clear_due": False}
         if due_date is not None:
             if due_date and due_date != _CLEAR_DATE:
                 body["dueDateTime"] = {
                     "dateTime": due_date,
                     "timeZone": "Europe/Berlin",
                 }
+                body.pop("_clear_due", None)
             elif due_date == _CLEAR_DATE:
-                # MS Graph: omit field entirely to clear it
-                pass
+                _LOGGER.debug("Clearing dueDate for task %s", task_id)
+                body.pop("_clear_due", None)
+                body["dueDateTime"] = {"dateTime": "", "timeZone": "UTC"}
         if importance is not None:
             body["importance"] = importance or "normal"
         if categories is not None:
@@ -209,6 +211,7 @@ class MatonTodoApi:
             else:
                 body["reminderDateTime"] = {"dateTime": None, "timeZone": "UTC"}
         if body:
+            body.pop("_clear_due", None)
             await self._request(
                 "PATCH",
                 f"/me/todo/lists/{list_id}/tasks/{task_id}",
