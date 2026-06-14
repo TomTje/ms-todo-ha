@@ -1,0 +1,24 @@
+name: HACS Plugin Publish
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create plugin directory
+        run: mkdir -p hacsfiles/ms_todo
+
+      - name: Copy plugin files
+        run: cp dist/ms-todo-card.js hacsfiles/ms_todo/ && cp info.md hacsfiles/ms_todo/README.md
+
+      - name: Publish to HACS
+        uses: "sgtcoolguy/hacsplugin-action@master"
+        with:
+          category: plugin
+        env:
+          HACS_TOKEN: ${{ secrets.HACS_TOKEN }}
