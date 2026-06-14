@@ -2,7 +2,6 @@
 
 Schritt 1: Token eingeben + testen
 Schritt 2: Liste auswählen
-Schritt 3: Polling-Intervall + Completed-Option
 """
 from __future__ import annotations
 
@@ -119,58 +118,50 @@ class MsTodoConfigFlow(ConfigFlow, domain=DOMAIN):
     ) -> ConfigFlowResult:
         """Schritt 2: Liste(n) auswählen."""
         if user_input is not None:
-            try:
-                selected_ids = user_input[CONF_LIST_ID]
-                # Multi-Select gibt Liste zurück, Single-Select einen String
-                if isinstance(selected_ids, str):
-                    selected_ids = [selected_ids]
-                
-                # Account-Info für Titel und data
-                account_name = self._profile.get("displayName", "Microsoft")
-                account_email = self._profile.get("userPrincipalName", "")
+            selected_ids = user_input[CONF_LIST_ID]
+            # Multi-Select gibt Liste zurück, Single-Select einen String
+            if isinstance(selected_ids, str):
+                selected_ids = [selected_ids]
 
-                # Erstelle einen ConfigEntry pro ausgewählter Liste
-                for list_id in selected_ids:
-                    list_name = next(
-                        (l.get("displayName", l["id"]) for l in self._lists if l["id"] == list_id),
-                        list_id,
-                    )
-                    await self.async_set_unique_id(f"{DOMAIN}_{list_id}")
-                    self._abort_if_unique_id_configured()
-                    await self.hass.config_entries.async_add(
-                        ConfigEntry(
-                            version=1,
-                            domain=DOMAIN,
-                            title=f"{account_name}: {list_name}",
-                            data={
-                                CONF_TOKEN: self._token,
-                                CONF_LIST_ID: list_id,
-                                CONF_LIST_NAME: list_name,
-                                CONF_ACCOUNT_NAME: account_name,
-                                CONF_ACCOUNT_EMAIL: account_email,
-                                CONF_SCAN_INTERVAL: DEFAULT_SCAN_INTERVAL,
-                                CONF_SHOW_COMPLETED: DEFAULT_SHOW_COMPLETED,
-                            },
-                            options={
-                                CONF_SCAN_INTERVAL: DEFAULT_SCAN_INTERVAL,
-                                CONF_SHOW_COMPLETED: DEFAULT_SHOW_COMPLETED,
-                            },
-                            discovery_keys={},
-                            minor_version=1,
-                            source="user",
-                            subentries_data={},
-                            unique_id=f"{DOMAIN}_{list_id}",
-                        )
-                    )
-                
-                return self.async_abort(reason="entries_created")
-            except Exception as err:
-                _LOGGER.exception("Fehler in async_step_list: %s", err)
-                return self.async_show_form(
-                    step_id="list",
-                    data_schema=_list_schema(self._lists),
-                    errors={"base": str(err)},
+            # Account-Info für Titel und data
+            account_name = self._profile.get("displayName", "Microsoft")
+            account_email = self._profile.get("userPrincipalName", "")
+
+            # Erstelle einen ConfigEntry pro ausgewählter Liste
+            for list_id in selected_ids:
+                list_name = next(
+                    (l.get("displayName", l["id"]) for l in self._lists if l["id"] == list_id),
+                    list_id,
                 )
+                await self.async_set_unique_id(f"{DOMAIN}_{list_id}")
+                self._abort_if_unique_id_configured()
+                await self.hass.config_entries.async_add(
+                    ConfigEntry(
+                        version=1,
+                        domain=DOMAIN,
+                        title=f"{account_name}: {list_name}",
+                        data={
+                            CONF_TOKEN: self._token,
+                            CONF_LIST_ID: list_id,
+                            CONF_LIST_NAME: list_name,
+                            CONF_ACCOUNT_NAME: account_name,
+                            CONF_ACCOUNT_EMAIL: account_email,
+                            CONF_SCAN_INTERVAL: DEFAULT_SCAN_INTERVAL,
+                            CONF_SHOW_COMPLETED: DEFAULT_SHOW_COMPLETED,
+                        },
+                        options={
+                            CONF_SCAN_INTERVAL: DEFAULT_SCAN_INTERVAL,
+                            CONF_SHOW_COMPLETED: DEFAULT_SHOW_COMPLETED,
+                        },
+                        discovery_keys={},
+                        minor_version=1,
+                        source="user",
+                        subentries_data={},
+                        unique_id=f"{DOMAIN}_{list_id}",
+                    )
+                )
+
+            return self.async_abort(reason="entries_created")
 
         return self.async_show_form(
             step_id="list",
@@ -181,13 +172,17 @@ class MsTodoConfigFlow(ConfigFlow, domain=DOMAIN):
     @callback
     def async_get_options_flow(
         config_entry: ConfigEntry,
-    ) -> "MsTodoOptionsFlow":
+    ) -> MsTodoOptionsFlow:
         """Verknüpfe den Options-Flow mit diesem Entry."""
-        return MsTodoOptionsFlow()
+        return MsTodoOptionsFlow(config_entry)
 
 
 class MsTodoOptionsFlow(OptionsFlow):
     """Options-Flow — Intervall + Completed-Toggle anpassen."""
+
+    def __init__(self, config_entry: ConfigEntry) -> None:
+        """Initialize options flow."""
+        super().__init__(config_entry)
 
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
