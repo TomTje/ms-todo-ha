@@ -195,7 +195,7 @@ class MatonTodoApi:
             elif due_date == _CLEAR_DATE:
                 _LOGGER.debug("Clearing dueDate for task %s", task_id)
                 body.pop("_clear_due", None)
-                body["dueDateTime"] = {"dateTime": "", "timeZone": "UTC"}
+                body["dueDateTime"] = None
         if importance is not None:
             body["importance"] = importance or "normal"
         if categories is not None:
