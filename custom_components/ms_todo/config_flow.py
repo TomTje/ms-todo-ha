@@ -75,7 +75,7 @@ def _options_schema() -> vol.Schema:
 class MsTodoConfigFlow(ConfigFlow, domain=DOMAIN):
     """Initialer Setup-Flow."""
 
-    VERSION = 2
+    VERSION = 1
 
     def __init__(self) -> None:
         """Initialisiere Flow-State."""
@@ -138,7 +138,7 @@ class MsTodoConfigFlow(ConfigFlow, domain=DOMAIN):
                 self._abort_if_unique_id_configured()
                 self.hass.config_entries.async_add_entry(
                     ConfigEntry(
-                        version=2,
+                        version=1,
                         domain=DOMAIN,
                         title=f"{account_name}: {list_name}",
                         data={
