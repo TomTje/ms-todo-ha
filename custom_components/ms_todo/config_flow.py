@@ -137,7 +137,7 @@ class MsTodoConfigFlow(ConfigFlow, domain=DOMAIN):
                     )
                     await self.async_set_unique_id(f"{DOMAIN}_{list_id}")
                     self._abort_if_unique_id_configured()
-                    self.hass.config_entries.async_add(
+                    await self.hass.config_entries.async_add(
                         ConfigEntry(
                             version=1,
                             domain=DOMAIN,
