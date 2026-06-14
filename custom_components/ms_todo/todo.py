@@ -20,7 +20,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import CONF_ACCOUNT_EMAIL, CONF_ACCOUNT_NAME, CONF_LIST_ID, CONF_LIST_NAME, DOMAIN
+from .const import CONF_ACCOUNT_EMAIL, CONF_ACCOUNT_NAME, CONF_LIST_ID, CONF_LIST_NAME, DOMAIN, _CLEAR_DATE
 from .coordinator import MsTodoCoordinator
 
 _LOGGER = logging.getLogger(__name__)
@@ -155,7 +155,7 @@ class MsTodoListEntity(
         if new_due_val is not None:
             new_due_str = new_due_val.isoformat()
         else:
-            new_due_str = ""  # None = keine Änderung, "" = löschen
+            new_due_str = _CLEAR_DATE  # sentinel: löschen
         if existing_due_str != new_due_str:
             await api.update_task_details(self._list_id, item.uid, due_date=new_due_str)
         await self.coordinator.async_request_refresh()

@@ -11,7 +11,7 @@ from typing import Any
 import aiohttp
 import async_timeout
 
-from .const import API_BASE
+from .const import API_BASE, _CLEAR_DATE
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -186,13 +186,14 @@ class MatonTodoApi:
         """Aktualisiere erweiterte Felder einer Aufgabe."""
         body: dict[str, Any] = {}
         if due_date is not None:
-            if due_date:
+            if due_date and due_date != _CLEAR_DATE:
                 body["dueDateTime"] = {
                     "dateTime": due_date,
                     "timeZone": "Europe/Berlin",
                 }
-            else:
-                body["dueDateTime"] = {"dateTime": None, "timeZone": "UTC"}
+            elif due_date == _CLEAR_DATE:
+                # MS Graph: omit field entirely to clear it
+                pass
         if importance is not None:
             body["importance"] = importance or "normal"
         if categories is not None:

@@ -30,3 +30,6 @@ ATTR_TASK_ID: Final = "task_id"
 ATTR_TITLE: Final = "title"
 ATTR_DESCRIPTION: Final = "description"
 ATTR_DUE_DATE: Final = "due_date"
+
+# Sentinel values for API calls
+_CLEAR_DATE: Final = "__CLEAR__"
