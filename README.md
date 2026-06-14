@@ -27,7 +27,6 @@ offizielle Microsoft-Graph-API proxied.
 1. Gehe zu https://maton.ai
 2. Verbinde dein Microsoft-Konto unter **Connections → Microsoft To Do**
 3. Erstelle einen API-Token unter **API Keys**
-4. Der Token startet mit `mat_`
 
 ## Installation
 

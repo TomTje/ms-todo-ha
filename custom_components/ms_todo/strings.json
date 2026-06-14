@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "Maton API-Token",
-        "description": "Hole den Token auf https://maton.ai → Connections → Microsoft To Do. Er beginnt mit 'mat_' und gibt uns Zugriff auf deine Listen.",
+        "description": "Hole den Token auf https://maton.ai → Connections → Microsoft To Do. Der Token wird in den API Keys erstellt.",
         "data": {
           "token": "Maton API-Token"
         }
