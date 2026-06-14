@@ -12,6 +12,8 @@ offizielle Microsoft-Graph-API proxied.
 - ✅ **Completed-Tasks toggle** (zeigen oder ausblenden)
 - ✅ **Token über UI** eintragen — kein YAML-Edit nötig
 - ✅ **Mehrere Listen** möglich (jede als eigener ConfigEntry)
+- ✅ **Fälligkeitsdatum** — Anzeige + Editieren direkt in HA Todo-UI
+- ✅ **Erweiterte Felder** — Wichtigkeit, Kategorien, Wiederholung, Erinnerung, Zugewiesen (nur Anzeige in Developer Tools)
 - 🔒 Token bleibt in HA, wird nicht an Dritte weitergegeben
 
 ## Voraussetzungen
@@ -25,7 +27,7 @@ offizielle Microsoft-Graph-API proxied.
 1. Gehe zu https://maton.ai
 2. Verbinde dein Microsoft-Konto unter **Connections → Microsoft To Do**
 3. Erstelle einen API-Token unter **API Keys**
-4. Der Token startet mit `mat_` (nicht mit `ghp_` wie ich oben teste — egal,HA nimmt beides)
+4. Der Token startet mit `mat_`
 
 ## Installation
 
@@ -94,4 +96,4 @@ MIT — privater Gebrauch, gerne erweitern.
 
 - Polling-basiert (kein Webhook von Microsoft-Seite)
 - Keine Sub-Tasks (Microsoft To Do hat das, aber unsere API nicht)
-- Keine Erinnerungen/Fälligkeitsdaten-Editing (nur Anzeige)
+- Erinnerungen, Wichtigkeit, Kategorien, Wiederholung, Zugewiesen — **nur Anzeige** (via Developer Tools extra_state_attributes), nicht editierbar in der HA Todo-UI
