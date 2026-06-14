@@ -147,8 +147,9 @@ class MsTodoListEntity(
         # Falls Description geändert, separat patchen
         existing_body = existing.get("body", {}) if existing else {}
         existing_desc = existing_body.get("content", "") if isinstance(existing_body, dict) else ""
-        if item.description is not None and item.description != existing_desc:
-            await api.update_task_description(self._list_id, item.uid, item.description)
+        # HA sendet "" wenn Feld geleert, None wenn unchanged → compare directly
+        if item.description != existing_desc:
+            await api.update_task_description(self._list_id, item.uid, item.description or "")
         # Falls dueDate geändert, separat patchen
         existing_due = existing.get("dueDateTime", {}) if existing else {}
         existing_due_str = existing_due.get("dateTime") if isinstance(existing_due, dict) else None

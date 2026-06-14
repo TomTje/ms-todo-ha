@@ -25,7 +25,7 @@ SCHEMA_SET_IMPORTANCE = vol.Schema(
 SCHEMA_SET_CATEGORIES = vol.Schema(
     {
         vol.Required("task_id"): str,
-        vol.Required("categories"): vol.All([str], vol.Length(min=1)),
+        vol.Required("categories"): vol.All([str]),
     }
 )
 
