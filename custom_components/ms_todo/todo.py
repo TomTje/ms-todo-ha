@@ -151,7 +151,11 @@ class MsTodoListEntity(
         # Falls dueDate geändert, separat patchen
         existing_due = existing.get("dueDateTime", {}) if existing else {}
         existing_due_str = existing_due.get("dateTime") if isinstance(existing_due, dict) else None
-        new_due_str: str | None = item.due.isoformat() if item.due else None
+        new_due_val: datetime | None = item.due
+        if new_due_val is not None:
+            new_due_str = new_due_val.isoformat()
+        else:
+            new_due_str = ""  # None = keine Änderung, "" = löschen
         if existing_due_str != new_due_str:
             await api.update_task_details(self._list_id, item.uid, due_date=new_due_str)
         await self.coordinator.async_request_refresh()
