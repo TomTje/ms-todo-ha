@@ -10,6 +10,7 @@ import logging
 from typing import Any
 
 import voluptuous as vol
+import homeassistant.helpers.config_validation as cv
 
 from homeassistant.config_entries import (
     ConfigEntry,
@@ -46,10 +47,10 @@ def _user_schema() -> vol.Schema:
 
 
 def _list_schema(lists: list[dict[str, Any]]) -> vol.Schema:
-    """Schema mit allen verfügbaren Listen als Dropdown."""
+    """Schema mit allen verfügbaren Listen als Multi-Select Checkboxen."""
     return vol.Schema(
         {
-            vol.Required(CONF_LIST_ID): vol.In(
+            vol.Required(CONF_LIST_ID): cv.multi_select(
                 {lst["id"]: lst.get("displayName", lst["id"]) for lst in lists}
             ),
         }
@@ -72,7 +73,7 @@ def _options_schema() -> vol.Schema:
 class MsTodoConfigFlow(ConfigFlow, domain=DOMAIN):
     """Initialer Setup-Flow."""
 
-    VERSION = 1
+    VERSION = 2
 
     def __init__(self) -> None:
         """Initialisiere Flow-State."""
@@ -112,28 +113,41 @@ class MsTodoConfigFlow(ConfigFlow, domain=DOMAIN):
     async def async_step_list(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
-        """Schritt 2: Liste auswählen."""
+        """Schritt 2: Liste(n) auswählen."""
         if user_input is not None:
-            list_id = user_input[CONF_LIST_ID]
-            list_name = next(
-                (l.get("displayName", l["id"]) for l in self._lists if l["id"] == list_id),
-                list_id,
-            )
-            # Eine Liste pro ConfigEntry — verhindert Konflikte
-            # und macht die Options später einfacher.
-            await self.async_set_unique_id(f"{DOMAIN}_{list_id}")
-            self._abort_if_unique_id_configured()
-            assert self._token is not None  # sicher, da step_user vorher lief
-            return self.async_create_entry(
-                title=f"MS To Do: {list_name}",
-                data={
-                    CONF_TOKEN: self._token,
-                    CONF_LIST_ID: list_id,
-                    CONF_LIST_NAME: list_name,
-                    CONF_SCAN_INTERVAL: DEFAULT_SCAN_INTERVAL,
-                    CONF_SHOW_COMPLETED: DEFAULT_SHOW_COMPLETED,
-                },
-            )
+            selected_ids = user_input[CONF_LIST_ID]
+            # Multi-Select gibt Liste zurück, Single-Select einen String
+            if isinstance(selected_ids, str):
+                selected_ids = [selected_ids]
+            
+            # Erstelle einen ConfigEntry pro ausgewählter Liste
+            for list_id in selected_ids:
+                list_name = next(
+                    (l.get("displayName", l["id"]) for l in self._lists if l["id"] == list_id),
+                    list_id,
+                )
+                await self.async_set_unique_id(f"{DOMAIN}_{list_id}")
+                self._abort_if_unique_id_configured()
+                self.hass.config_entries.async_add_entry(
+                    ConfigEntry(
+                        version=2,
+                        domain=DOMAIN,
+                        title=f"MS To Do: {list_name}",
+                        data={
+                            CONF_TOKEN: self._token,
+                            CONF_LIST_ID: list_id,
+                            CONF_LIST_NAME: list_name,
+                            CONF_SCAN_INTERVAL: DEFAULT_SCAN_INTERVAL,
+                            CONF_SHOW_COMPLETED: DEFAULT_SHOW_COMPLETED,
+                        },
+                        options={
+                            CONF_SCAN_INTERVAL: DEFAULT_SCAN_INTERVAL,
+                            CONF_SHOW_COMPLETED: DEFAULT_SHOW_COMPLETED,
+                        },
+                    )
+                )
+            
+            return self.async_abort(reason="entries_created")
 
         return self.async_show_form(
             step_id="list",
