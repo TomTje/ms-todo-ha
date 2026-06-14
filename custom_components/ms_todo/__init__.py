@@ -10,7 +10,7 @@ from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .api import MatonAuthError, MatonTodoApi, MatonTodoApiError
-from .const import CONF_LIST_ID, CONF_LIST_NAME, DOMAIN
+from .const import CONF_ACCOUNT_EMAIL, CONF_ACCOUNT_NAME, CONF_LIST_ID, CONF_LIST_NAME, DOMAIN
 from .coordinator import MsTodoCoordinator
 
 _LOGGER = logging.getLogger(__name__)

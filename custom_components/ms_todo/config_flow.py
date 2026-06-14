@@ -23,6 +23,8 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .api import MatonAuthError, MatonTodoApi, MatonTodoApiError
 from .const import (
+    CONF_ACCOUNT_EMAIL,
+    CONF_ACCOUNT_NAME,
     CONF_LIST_ID,
     CONF_LIST_NAME,
     CONF_SCAN_INTERVAL,
@@ -79,6 +81,7 @@ class MsTodoConfigFlow(ConfigFlow, domain=DOMAIN):
         """Initialisiere Flow-State."""
         self._token: str | None = None
         self._lists: list[dict[str, Any]] = []
+        self._profile: dict[str, Any] = {}
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
@@ -91,6 +94,7 @@ class MsTodoConfigFlow(ConfigFlow, domain=DOMAIN):
             api = MatonTodoApi(session, self._token)
             try:
                 self._lists = await api.get_lists()
+                self._profile = await api.get_profile()
             except MatonAuthError:
                 errors["base"] = "invalid_auth"
             except MatonTodoApiError:
@@ -120,6 +124,10 @@ class MsTodoConfigFlow(ConfigFlow, domain=DOMAIN):
             if isinstance(selected_ids, str):
                 selected_ids = [selected_ids]
             
+            # Account-Info für Titel und data
+            account_name = self._profile.get("displayName", "Microsoft")
+            account_email = self._profile.get("userPrincipalName", "")
+
             # Erstelle einen ConfigEntry pro ausgewählter Liste
             for list_id in selected_ids:
                 list_name = next(
@@ -132,11 +140,13 @@ class MsTodoConfigFlow(ConfigFlow, domain=DOMAIN):
                     ConfigEntry(
                         version=2,
                         domain=DOMAIN,
-                        title=f"MS To Do: {list_name}",
+                        title=f"{account_name}: {list_name}",
                         data={
                             CONF_TOKEN: self._token,
                             CONF_LIST_ID: list_id,
                             CONF_LIST_NAME: list_name,
+                            CONF_ACCOUNT_NAME: account_name,
+                            CONF_ACCOUNT_EMAIL: account_email,
                             CONF_SCAN_INTERVAL: DEFAULT_SCAN_INTERVAL,
                             CONF_SHOW_COMPLETED: DEFAULT_SHOW_COMPLETED,
                         },

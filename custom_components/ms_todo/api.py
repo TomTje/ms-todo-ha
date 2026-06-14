@@ -66,6 +66,15 @@ class MatonTodoApi:
         except (aiohttp.ClientError, TimeoutError) as err:
             raise MatonTodoApiError(f"Netzwerk-Fehler: {err}") from err
 
+    # ----- Profile -----
+
+    async def get_profile(self) -> dict[str, Any]:
+        """Hole Profil-Info (Name, Email) für Account-Anzeige."""
+        result = await self._request("GET", "/me")
+        if not isinstance(result, dict):
+            return {}
+        return result
+
     # ----- Listen -----
 
     async def get_lists(self) -> list[dict[str, Any]]:
@@ -130,6 +139,17 @@ class MatonTodoApi:
             "PATCH",
             f"/me/todo/lists/{list_id}/tasks/{task_id}",
             json={"title": title},
+        )
+
+    async def update_task_description(
+        self, list_id: str, task_id: str, description: str
+    ) -> None:
+        """Ändere die Notiz/Beschreibung einer Aufgabe."""
+        body = {"body": {"content": description, "contentType": "text"}}
+        await self._request(
+            "PATCH",
+            f"/me/todo/lists/{list_id}/tasks/{task_id}",
+            json=body,
         )
 
     async def delete_task(self, list_id: str, task_id: str) -> None:

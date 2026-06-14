@@ -13,6 +13,8 @@ API_BASE: Final = "https://api.maton.ai/microsoft-to-do/v1.0"
 CONF_TOKEN: Final = "token"
 CONF_LIST_ID: Final = "list_id"
 CONF_LIST_NAME: Final = "list_name"
+CONF_ACCOUNT_NAME: Final = "account_name"
+CONF_ACCOUNT_EMAIL: Final = "account_email"
 CONF_SCAN_INTERVAL: Final = "scan_interval"
 CONF_SHOW_COMPLETED: Final = "show_completed"
 

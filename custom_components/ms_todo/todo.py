@@ -19,7 +19,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import CONF_LIST_ID, CONF_LIST_NAME, DOMAIN
+from .const import CONF_ACCOUNT_EMAIL, CONF_ACCOUNT_NAME, CONF_LIST_ID, CONF_LIST_NAME, DOMAIN
 from .coordinator import MsTodoCoordinator
 
 _LOGGER = logging.getLogger(__name__)
@@ -49,6 +49,7 @@ class MsTodoListEntity(
         | TodoListEntityFeature.UPDATE_TODO_ITEM
         | TodoListEntityFeature.DELETE_TODO_ITEM
     )
+    _attr_extra_state_attributes = {}
 
     def __init__(
         self, coordinator: MsTodoCoordinator, entry: ConfigEntry
@@ -59,6 +60,11 @@ class MsTodoListEntity(
         self._entry = entry
         self._list_name = entry.data[CONF_LIST_NAME]
         self._list_id = entry.data[CONF_LIST_ID]
+        # Account-Info als Extra-State-Attribute für Developer-Tools-Sichtbarkeit
+        self._attr_extra_state_attributes = {
+            "account_name": entry.data.get(CONF_ACCOUNT_NAME, ""),
+            "account_email": entry.data.get(CONF_ACCOUNT_EMAIL, ""),
+        }
 
     @property
     def name(self) -> str:
@@ -77,6 +83,9 @@ class MsTodoListEntity(
             return None
         items: list[TodoItem] = []
         for task in self.coordinator.data:
+            # Notes/Beschreibung aus body.content lesen
+            body = task.get("body", {})
+            description = body.get("content", "") if isinstance(body, dict) else ""
             items.append(
                 TodoItem(
                     uid=task["id"],
@@ -86,6 +95,7 @@ class MsTodoListEntity(
                         if task.get("status") == "completed"
                         else TodoItemStatus.NEEDS_ACTION
                     ),
+                    description=description,
                 )
             )
         return items
@@ -101,7 +111,7 @@ class MsTodoListEntity(
         await self.coordinator.async_request_refresh()
 
     async def async_update_todo_item(self, item: TodoItem) -> None:
-        """Toggle Status oder Titel-Update."""
+        """Toggle Status oder Titel/Description-Update."""
         api = self.hass.data[DOMAIN][self._entry.entry_id]["api"]
         # Erst Status toggle, falls geändert
         await api.update_task_status(
@@ -114,6 +124,11 @@ class MsTodoListEntity(
         )
         if existing and existing.get("title") != item.summary:
             await api.update_task_title(self._list_id, item.uid, item.summary)
+        # Falls Description geändert, separat patchen
+        existing_body = existing.get("body", {}) if existing else {}
+        existing_desc = existing_body.get("content", "") if isinstance(existing_body, dict) else ""
+        if item.description is not None and item.description != existing_desc:
+            await api.update_task_description(self._list_id, item.uid, item.description)
         await self.coordinator.async_request_refresh()
 
     async def async_delete_todo_items(self, uids: list[str]) -> None:
