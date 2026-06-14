@@ -1,7 +1,7 @@
 {
   "domain": "ms_todo",
   "name": "Microsoft To Do (Maton)",
-  "version": "0.3.7",
+  "version": "0.3.9",
   "config_flow": true,
   "documentation": "https://github.com/TomTje/ms-todo-ha",
   "issue_tracker": "https://github.com/TomTje/ms-todo-ha/issues",
