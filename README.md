@@ -13,7 +13,7 @@ offizielle Microsoft-Graph-API proxied.
 - ✅ **Token über UI** eintragen — kein YAML-Edit nötig
 - ✅ **Mehrere Listen** möglich (jede als eigener ConfigEntry)
 - ✅ **Fälligkeitsdatum** — Anzeige + Editieren direkt in HA Todo-UI
-- ✅ **Erweiterte Felder** — Wichtigkeit, Kategorien, Wiederholung, Erinnerung, Zugewiesen (nur Anzeige in Developer Tools)
+- ✅ **Beschreibung** — Anzeige + Editieren direkt in HA Todo-UI
 - 🔒 Token bleibt in HA, wird nicht an Dritte weitergegeben
 
 ## Voraussetzungen
@@ -96,4 +96,4 @@ MIT — privater Gebrauch, gerne erweitern.
 
 - Polling-basiert (kein Webhook von Microsoft-Seite)
 - Keine Sub-Tasks (Microsoft To Do hat das, aber unsere API nicht)
-- Erinnerungen, Wichtigkeit, Kategorien, Wiederholung, Zugewiesen — **nur Anzeige** (via Developer Tools extra_state_attributes), nicht editierbar in der HA Todo-UI
+- Wichtigkeit, Kategorien, Wiederholung, Erinnerung, Zugewiesen — werden von MS Graph abgerufen und sind in den `extra_state_attributes` sichtbar, aber nicht über die HA Todo-UI editierbar
