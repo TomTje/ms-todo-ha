@@ -49,7 +49,7 @@ class MsTodoListEntity(
         TodoListEntityFeature.CREATE_TODO_ITEM
         | TodoListEntityFeature.UPDATE_TODO_ITEM
         | TodoListEntityFeature.DELETE_TODO_ITEM
-        | TodoListEntityFeature.SET_DUE_DATE
+        | TodoListEntityFeature.SET_DUE_DATE_ON_ITEM
     )
     _attr_extra_state_attributes = {}
 
