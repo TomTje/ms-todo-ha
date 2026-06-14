@@ -6,6 +6,7 @@ Items + Status und reagiert auf Add/Update/Delete-Service-Calls.
 from __future__ import annotations
 
 import logging
+from datetime import datetime, timezone
 from typing import Any
 
 from homeassistant.components.todo import (
@@ -48,6 +49,7 @@ class MsTodoListEntity(
         TodoListEntityFeature.CREATE_TODO_ITEM
         | TodoListEntityFeature.UPDATE_TODO_ITEM
         | TodoListEntityFeature.DELETE_TODO_ITEM
+        | TodoListEntityFeature.SET_DUE_DATE
     )
     _attr_extra_state_attributes = {}
 
@@ -86,6 +88,18 @@ class MsTodoListEntity(
             # Notes/Beschreibung aus body.content lesen
             body = task.get("body", {})
             description = body.get("content", "") if isinstance(body, dict) else ""
+
+            # Fälligkeitsdatum parsen
+            due: datetime | None = None
+            due_raw = task.get("dueDateTime")
+            if due_raw and isinstance(due_raw, dict):
+                dt_str = due_raw.get("dateTime")
+                if dt_str:
+                    try:
+                        due = datetime.fromisoformat(dt_str.replace("Z", "+00:00"))
+                    except ValueError:
+                        pass
+
             items.append(
                 TodoItem(
                     uid=task["id"],
@@ -96,6 +110,7 @@ class MsTodoListEntity(
                         else TodoItemStatus.NEEDS_ACTION
                     ),
                     description=description,
+                    due=due,
                 )
             )
         return items
@@ -103,10 +118,14 @@ class MsTodoListEntity(
     async def async_create_todo_item(self, item: TodoItem) -> None:
         """Wird von der UI aufgerufen, wenn der User was hinzufügt."""
         api = self.hass.data[DOMAIN][self._entry.entry_id]["api"]
+        due_str: str | None = None
+        if item.due:
+            due_str = item.due.isoformat()
         await api.create_task(
             self._list_id,
             item.summary,
             item.description,
+            due_date=due_str,
         )
         await self.coordinator.async_request_refresh()
 
@@ -129,6 +148,12 @@ class MsTodoListEntity(
         existing_desc = existing_body.get("content", "") if isinstance(existing_body, dict) else ""
         if item.description is not None and item.description != existing_desc:
             await api.update_task_description(self._list_id, item.uid, item.description)
+        # Falls dueDate geändert, separat patchen
+        existing_due = existing.get("dueDateTime", {}) if existing else {}
+        existing_due_str = existing_due.get("dateTime") if isinstance(existing_due, dict) else None
+        new_due_str: str | None = item.due.isoformat() if item.due else None
+        if existing_due_str != new_due_str:
+            await api.update_task_details(self._list_id, item.uid, due_date=new_due_str)
         await self.coordinator.async_request_refresh()
 
     async def async_delete_todo_items(self, uids: list[str]) -> None:

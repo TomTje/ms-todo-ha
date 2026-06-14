@@ -109,11 +109,32 @@ class MatonTodoApi:
         list_id: str,
         title: str,
         description: str | None = None,
+        due_date: str | None = None,
+        importance: str | None = None,
+        categories: list[str] | None = None,
+        recurrence: dict | None = None,
+        reminder: str | None = None,
     ) -> dict[str, Any]:
         """Lege eine neue Aufgabe an."""
         body: dict[str, Any] = {"title": title}
         if description:
             body["body"] = {"content": description, "contentType": "text"}
+        if due_date:
+            body["dueDateTime"] = {
+                "dateTime": due_date,
+                "timeZone": "Europe/Berlin",
+            }
+        if importance:
+            body["importance"] = importance
+        if categories:
+            body["categories"] = categories
+        if recurrence:
+            body["recurrence"] = recurrence
+        if reminder:
+            body["reminderDateTime"] = {
+                "dateTime": reminder,
+                "timeZone": "Europe/Berlin",
+            }
         result = await self._request(
             "POST", f"/me/todo/lists/{list_id}/tasks", json=body
         )
@@ -151,6 +172,47 @@ class MatonTodoApi:
             f"/me/todo/lists/{list_id}/tasks/{task_id}",
             json=body,
         )
+
+    async def update_task_details(
+        self,
+        list_id: str,
+        task_id: str,
+        due_date: str | None = None,
+        importance: str | None = None,
+        categories: list[str] | None = None,
+        recurrence: dict | None = None,
+        reminder: str | None = None,
+    ) -> None:
+        """Aktualisiere erweiterte Felder einer Aufgabe."""
+        body: dict[str, Any] = {}
+        if due_date is not None:
+            if due_date:
+                body["dueDateTime"] = {
+                    "dateTime": due_date,
+                    "timeZone": "Europe/Berlin",
+                }
+            else:
+                body["dueDateTime"] = {"dateTime": None, "timeZone": "UTC"}
+        if importance is not None:
+            body["importance"] = importance or "normal"
+        if categories is not None:
+            body["categories"] = categories
+        if recurrence is not None:
+            body["recurrence"] = recurrence
+        if reminder is not None:
+            if reminder:
+                body["reminderDateTime"] = {
+                    "dateTime": reminder,
+                    "timeZone": "Europe/Berlin",
+                }
+            else:
+                body["reminderDateTime"] = {"dateTime": None, "timeZone": "UTC"}
+        if body:
+            await self._request(
+                "PATCH",
+                f"/me/todo/lists/{list_id}/tasks/{task_id}",
+                json=body,
+            )
 
     async def delete_task(self, list_id: str, task_id: str) -> None:
         """Lösche eine Aufgabe unwiderruflich."""
